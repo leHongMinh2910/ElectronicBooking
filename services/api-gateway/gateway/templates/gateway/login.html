@@ -1,0 +1,25 @@
+{% extends "gateway/base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="glass-card rounded-4 shadow-sm p-4 p-lg-5">
+            <h1 class="h2 mb-3">Dang nhap he thong</h1>
+            <p class="text-secondary">Chon dung vai tro de gateway gui yeu cau sang service phu hop.</p>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="col-12">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <div class="col-12 d-grid">
+                    <button class="btn btn-primary btn-lg" type="submit">Dang nhap</button>
+                </div>
+            </form>
+            <p class="mt-4 mb-0">Chua co tai khoan customer? <a href="{% url 'register' %}">Dang ky ngay</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

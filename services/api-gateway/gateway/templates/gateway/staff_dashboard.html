@@ -1,0 +1,124 @@
+{% extends "gateway/base.html" %}
+{% block content %}
+<section class="hero-panel p-4 p-lg-5 mb-4">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-8">
+            <h1 class="display-6 fw-bold">Staff Dashboard</h1>
+            <p class="lead text-white-50 mb-0">Nhap item va cap nhat item thong qua `staff-service`, du lieu catalog duoc day vao `laptop-service` hoac `mobile-service`.</p>
+        </div>
+        <div class="col-lg-4">
+            <div class="glass-card rounded-4 p-4 text-dark">
+                <div class="row g-3">
+                    <div class="col-6">
+                        <div class="metric-card p-3 bg-light">
+                            <div class="small text-secondary">Laptop</div>
+                            <div class="h3 mb-0">{{ laptop_items|length }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="metric-card p-3 bg-light">
+                            <div class="small text-secondary">Mobile</div>
+                            <div class="h3 mb-0">{{ mobile_items|length }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card product-card h-100">
+            <div class="card-body p-4">
+                <h2 class="h4">Nhap kho laptop</h2>
+                <p class="text-secondary">Tao item moi vao PostgreSQL service cua laptop.</p>
+                <a class="btn btn-primary" href="{% url 'create-item' 'laptop' %}">Them laptop</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card product-card h-100">
+            <div class="card-body p-4">
+                <h2 class="h4">Nhap kho mobile</h2>
+                <p class="text-secondary">Tao item moi vao PostgreSQL service cua dien thoai.</p>
+                <a class="btn btn-dark" href="{% url 'create-item' 'mobile' %}">Them mobile</a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="row g-4">
+    <div class="col-xl-6">
+        <div class="card product-card">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-3">Danh sach laptop</h2>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Ten</th><th>Gia</th><th>Ton kho</th><th></th></tr></thead>
+                        <tbody>
+                        {% for item in laptop_items %}
+                            <tr>
+                                <td>{{ item.brand }} {{ item.name }}</td>
+                                <td>${{ item.price }}</td>
+                                <td>{{ item.stock }}</td>
+                                <td><a class="btn btn-sm btn-outline-primary" href="{% url 'update-item' 'laptop' item.id %}">Cap nhat</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Chua co laptop nao.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card product-card">
+            <div class="card-body p-4">
+                <h2 class="h4 mb-3">Danh sach mobile</h2>
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead><tr><th>Ten</th><th>Gia</th><th>Ton kho</th><th></th></tr></thead>
+                        <tbody>
+                        {% for item in mobile_items %}
+                            <tr>
+                                <td>{{ item.brand }} {{ item.name }}</td>
+                                <td>${{ item.price }}</td>
+                                <td>{{ item.stock }}</td>
+                                <td><a class="btn btn-sm btn-outline-dark" href="{% url 'update-item' 'mobile' item.id %}">Cap nhat</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4">Chua co mobile nao.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="mt-4">
+    <div class="card product-card">
+        <div class="card-body p-4">
+            <h2 class="h4 mb-3">Lich su thao tac staff-service</h2>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead><tr><th>Thoi gian</th><th>Loai</th><th>Dich vu</th><th>San pham</th><th>Trang thai</th></tr></thead>
+                    <tbody>
+                    {% for log in action_logs %}
+                        <tr>
+                            <td>{{ log.created_at }}</td>
+                            <td>{{ log.action_type }}</td>
+                            <td>{{ log.target_service }}</td>
+                            <td>{{ log.product_name }}</td>
+                            <td>{{ log.status }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5">Chua co thao tac nao.</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

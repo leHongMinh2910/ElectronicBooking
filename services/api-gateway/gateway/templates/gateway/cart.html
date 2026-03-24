@@ -1,0 +1,50 @@
+{% extends "gateway/base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="display-6 fw-bold mb-1">Gio hang cua customer</h1>
+        <p class="text-secondary mb-0">Use case tao gio hang duoc xu ly boi `customer-service`.</p>
+    </div>
+    <a href="{% url 'customer-dashboard' %}" class="btn btn-outline-primary">Tiep tuc mua hang</a>
+</div>
+<div class="card product-card">
+    <div class="card-body p-4">
+        {% if cart.items %}
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Loai</th>
+                            <th>San pham</th>
+                            <th>So luong</th>
+                            <th>Tam tinh</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in cart.items %}
+                        <tr>
+                            <td><span class="tag-chip">{{ item.product_service }}</span></td>
+                            <td>{{ item.brand }} {{ item.product_name }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.subtotal }}</td>
+                            <td>
+                                <form method="post" action="{% url 'delete-cart-item' item.id %}">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Xoa</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-end mt-3">
+                <h3 class="h4">Tong tien: ${{ cart.total_amount }}</h3>
+            </div>
+        {% else %}
+            <p class="mb-0">Gio hang dang trong. Them san pham tu dashboard customer.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

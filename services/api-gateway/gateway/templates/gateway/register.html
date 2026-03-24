@@ -1,0 +1,24 @@
+{% extends "gateway/base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="glass-card rounded-4 shadow-sm p-4 p-lg-5">
+            <h1 class="h2 mb-3">Dang ky customer</h1>
+            <p class="text-secondary">Sau khi dang ky, customer co the dang nhap, tim san pham va tao gio hang.</p>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="col-md-6">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <div class="col-12 d-grid">
+                    <button class="btn btn-primary btn-lg" type="submit">Tao tai khoan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

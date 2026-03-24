@@ -1,0 +1,165 @@
+services:
+  api-gateway:
+    build:
+      context: ./services/api-gateway
+    environment:
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      CUSTOMER_SERVICE_URL: ${CUSTOMER_SERVICE_URL:-http://customer-service:8000}
+      STAFF_SERVICE_URL: ${STAFF_SERVICE_URL:-http://staff-service:8000}
+      LAPTOP_SERVICE_URL: ${LAPTOP_SERVICE_URL:-http://laptop-service:8000}
+      MOBILE_SERVICE_URL: ${MOBILE_SERVICE_URL:-http://mobile-service:8000}
+    depends_on:
+      - customer-service
+      - staff-service
+      - laptop-service
+      - mobile-service
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "sleep 20 &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+
+  customer-db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: customer_db
+      MYSQL_USER: ${MYSQL_USER:-electronics}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-electronics}
+    ports:
+      - "3307:3306"
+    volumes:
+      - customer_mysql_data:/var/lib/mysql
+
+  staff-db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: staff_db
+      MYSQL_USER: ${MYSQL_USER:-electronics}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-electronics}
+    ports:
+      - "3308:3306"
+    volumes:
+      - staff_mysql_data:/var/lib/mysql
+
+  laptop-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: laptop_db
+      POSTGRES_USER: ${POSTGRES_USER:-electronics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-electronics}
+    ports:
+      - "5433:5432"
+    volumes:
+      - laptop_postgres_data:/var/lib/postgresql/data
+
+  mobile-db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: mobile_db
+      POSTGRES_USER: ${POSTGRES_USER:-electronics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-electronics}
+    ports:
+      - "5434:5432"
+    volumes:
+      - mobile_postgres_data:/var/lib/postgresql/data
+
+  customer-service:
+    build:
+      context: ./services/customer-service
+    environment:
+      MYSQL_DB: customer_db
+      MYSQL_HOST: customer-db
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-electronics}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-electronics}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+    depends_on:
+      - customer-db
+    ports:
+      - "8001:8000"
+    command: >
+      sh -c "sleep 20 &&
+      python manage.py makemigrations accounts &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+
+  staff-service:
+    build:
+      context: ./services/staff-service
+    environment:
+      MYSQL_DB: staff_db
+      MYSQL_HOST: staff-db
+      MYSQL_PORT: 3306
+      MYSQL_USER: ${MYSQL_USER:-electronics}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-electronics}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+      LAPTOP_SERVICE_URL: ${LAPTOP_SERVICE_URL:-http://laptop-service:8000}
+      MOBILE_SERVICE_URL: ${MOBILE_SERVICE_URL:-http://mobile-service:8000}
+    depends_on:
+      - staff-db
+      - laptop-service
+      - mobile-service
+    ports:
+      - "8002:8000"
+    command: >
+      sh -c "sleep 25 &&
+      python manage.py makemigrations accounts &&
+      python manage.py migrate &&
+      python manage.py seed_staff &&
+      python manage.py runserver 0.0.0.0:8000"
+
+  laptop-service:
+    build:
+      context: ./services/laptop-service
+    environment:
+      POSTGRES_DB: laptop_db
+      POSTGRES_HOST: laptop-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-electronics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-electronics}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+    depends_on:
+      - laptop-db
+    ports:
+      - "8003:8000"
+    command: >
+      sh -c "sleep 20 &&
+      python manage.py makemigrations catalog &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+
+  mobile-service:
+    build:
+      context: ./services/mobile-service
+    environment:
+      POSTGRES_DB: mobile_db
+      POSTGRES_HOST: mobile-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-electronics}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-electronics}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+    depends_on:
+      - mobile-db
+    ports:
+      - "8004:8000"
+    command: >
+      sh -c "sleep 20 &&
+      python manage.py makemigrations catalog &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+
+volumes:
+  customer_mysql_data:
+  staff_mysql_data:
+  laptop_postgres_data:
+  mobile_postgres_data:

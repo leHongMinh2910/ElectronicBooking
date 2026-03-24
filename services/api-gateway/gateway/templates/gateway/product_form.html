@@ -1,0 +1,30 @@
+{% extends "gateway/base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="glass-card rounded-4 shadow-sm p-4 p-lg-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <span class="tag-chip">{{ target_service }}</span>
+                    <h1 class="h2 mt-3 mb-1">{{ page_title }}</h1>
+                    <p class="text-secondary mb-0">Form duoc submit ve `staff-service`, sau do staff-service goi den product service tuong ung.</p>
+                </div>
+                <a class="btn btn-outline-secondary" href="{% url 'staff-dashboard' %}">Quay lai</a>
+            </div>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="col-md-6">
+                        <label class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors|join:", " }}</div>{% endif %}
+                    </div>
+                {% endfor %}
+                <div class="col-12 d-grid">
+                    <button class="btn btn-primary btn-lg" type="submit">Luu item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
